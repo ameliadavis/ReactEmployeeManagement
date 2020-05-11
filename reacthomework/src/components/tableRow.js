@@ -1,7 +1,7 @@
 import React from "react";
 
 const TableRow = props => {
-      console.log({props});
+      
             return (
                 <tbody>
                       <tr key={props.email}>

@@ -3,14 +3,17 @@ import TableRow from "./components/tableRow";
 import Nav from "./components/nav"
 
 import API from "./utils/API.js"
+import { object } from "prop-types";
 
 const App = () => {
 
   const[state, setState]= useState({
     users: [],
+    filteredState: [],
+    searchTerm: "",
   })
 
-const {users}= state
+const {users, filteredState, searchTerm}= state
 
 const userSearch = () => {
   API.userCall()
@@ -18,19 +21,42 @@ const userSearch = () => {
     console.log(res.data.results)
     setState({
       users: res.data.results, 
+      filteredState: res.data.results
     })
   })
   .catch(err => console.log(err))
 }
 
+const SearchResults = (searchTerm) => {
+    console.log(searchTerm)
+    let filtered = users.filter(user => {
+     let userArray = Object.values(user).join("").toLowerCase()
+    //  userArray.push(user)
+     console.log(userArray)
+     console.log(userArray.indexOf(searchTerm))
+     return (userArray.indexOf(searchTerm.toLowerCase()) !== -1)
+      })
+    setState({
+      filteredState: filtered, 
+    })
+}
 
 useEffect(()=> {
   userSearch()
 }, [])
 
+const handleFormSubmit = e => {
+  e.preventDefault();
+  SearchResults(searchTerm);
+}
+
   return (
     <wrapper>
-      <Nav></Nav>
+      <Nav
+        searchTerm = {searchTerm}
+        handleInputChange = {(e) => setState({...state, searchTerm: e.target.value})}
+        handleFormSubmit = {handleFormSubmit}
+      ></Nav>
       <div class="jumbotron jumbotron-fluid">
         <div class="container">
                 <div class="card">
@@ -46,7 +72,7 @@ useEffect(()=> {
                                 <th scope="col">State</th>
                                 </tr>
                             </thead>
-                              {users.map(users =>(
+                              {filteredState.map(users =>(
                                 <TableRow 
                                   key = {users.email}
                                   first = {users.name.first} 
