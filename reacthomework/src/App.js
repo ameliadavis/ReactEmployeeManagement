@@ -1,9 +1,11 @@
 import React,{useState,useEffect} from "react";
 import TableRow from "./components/tableRow";
 import Nav from "./components/nav"
-
+import 'bootstrap/dist/css/bootstrap.min.css';
 import API from "./utils/API.js"
-import { object } from "prop-types";
+import moment from 'moment';
+import { Table } from "reactstrap";
+
 
 const App = () => {
 
@@ -11,9 +13,10 @@ const App = () => {
     users: [],
     filteredState: [],
     searchTerm: "",
+    // selectValue: ""
   })
 
-const {users, filteredState, searchTerm}= state
+const {users, filteredState, searchTerm} = state
 
 const userSearch = () => {
   API.userCall()
@@ -50,26 +53,43 @@ const handleFormSubmit = e => {
   SearchResults(searchTerm);
 }
 
+
+
+ const clickSort = e => {
+   console.log(filteredState)
+    const  sorted =   filteredState.sort(function(a,b){
+     var locationA= a.location.state , locationB =b.location.state
+     if(locationA < locationB)
+     return -1
+   })
+   console.log(sorted)
+   setState({
+    filteredState: sorted, 
+  })
+ }
+
+
   return (
     <wrapper>
       <Nav
         searchTerm = {searchTerm}
-        handleInputChange = {(e) => setState({...state, searchTerm: e.target.value})}
+        handleInputChange = {(e) => setState({...state, searchTerm: e.target.value })}
         handleFormSubmit = {handleFormSubmit}
-      ></Nav>
+       >
+      </Nav>
       <div class="jumbotron jumbotron-fluid">
         <div class="container">
                 <div class="card">
                         <div class="card-body">
-                          <table>
+                          <Table bordered>
                             <thead>
-                                <tr>
+                                <tr> 
                                 <th scope="col">First Name</th>
                                 <th scope="col">Last Name</th>
                                 <th scope="col">Email</th>
                                 <th scope="col">DOB</th>
                                 <th scope="col">Cell</th>
-                                <th scope="col">State</th>
+                                <th scope="col">State<button style={{float: "right"}} onClick ={clickSort} > Sort</button> </th>
                                 </tr>
                             </thead>
                               {filteredState.map(users =>(
@@ -78,19 +98,19 @@ const handleFormSubmit = e => {
                                   first = {users.name.first} 
                                   last = {users.name.last} 
                                   email = {users.email}
-                                  dob = {users.dob.date}
+                                  dob = {moment(users.dob.date,"YYYY-MM-DDT").format("MM-DD-YYYY")}
                                   cell = {users.cell}  
                                   state = {users.location.state}                          
                                 ></TableRow>
                                 ))}
-                            </table>
+                            </Table>
                         </div>
                      </div>
             </div>
     </div>
 </wrapper>
    
-
+  
   );
 }
 
